@@ -3,12 +3,10 @@
  */
 //package de.fhac.rn.xml;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Scanner;
 
 import javax.xml.bind.JAXBException;
 
@@ -23,6 +21,15 @@ public class Client {
             System.out.println("success");
         }
 
+        UTFOutputStream dataOutputStream = new UTFOutputStream(socket.getOutputStream());
+        
+        String msg = XMLHandler.getInstance().getMazeCom();
+       
+        System.out.println(msg);
+        
+        dataOutputStream.writeUTF8(msg);
+        dataOutputStream.flush();
+        
 //        XMLSerialisation serializer = new XMLSerialisation(socket.getLocalAddress().getHostName());
 
 //        Scanner scanner = new Scanner(System.in);
@@ -39,5 +46,6 @@ public class Client {
 //        scanner.close();
         socket.close();
     }
+    
 
 }
