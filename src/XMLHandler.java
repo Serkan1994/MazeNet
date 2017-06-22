@@ -1,8 +1,10 @@
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import generated.LoginMessageType;
 import generated.MazeCom;
@@ -16,6 +18,7 @@ public class XMLHandler {
 	private JAXBContext jc;
 	
 	private Marshaller marshaller;
+	private Unmarshaller unmarshaller;
 	
 	public static XMLHandler getInstance() {
 		if(instance == null)
@@ -33,9 +36,10 @@ public class XMLHandler {
 		of = new ObjectFactory();
 	 	jc = JAXBContext.newInstance(MazeCom.class);
 	 	marshaller = jc.createMarshaller();
+	 	unmarshaller = jc.createUnmarshaller();
 	}
 	
-    String getMazeCom() throws JAXBException {
+    String createLoginMessage() throws JAXBException {
         MazeCom msg = of.createMazeCom();
         msg.setMcType(MazeComType.LOGIN);
         LoginMessageType type = of.createLoginMessageType();
@@ -46,7 +50,10 @@ public class XMLHandler {
         return sw.toString();
     }
 
-
+    MazeCom getMessage(String xmlString) throws JAXBException {
+    	StringReader reader = new StringReader(xmlString);
+    	return (MazeCom) unmarshaller.unmarshal(reader);
+    }
 	
  	
 }
