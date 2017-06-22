@@ -10,15 +10,24 @@ import java.net.UnknownHostException;
 
 import javax.xml.bind.JAXBException;
 
+import AI.AI;
+import AI.SimpleAI;
+import AI.simpleAI;
 import generated.AwaitMoveMessageType;
 import generated.LoginReplyMessageType;
 import generated.MazeCom;
+import generated.MoveMessageType;
 
 //import mypackage.EchoMessage;
 
 public class Client {
 
 	private int id;
+	private AI ai;
+	private Socket socket;
+
+	private UTFOutputStream outStream;
+	private UTFInputStream inStream;
 
 	private static boolean VERBOSE = true;
 
@@ -26,22 +35,37 @@ public class Client {
 		new Client();
 	}
 
-	public Client() throws UnknownHostException, IOException, JAXBException {
-		System.out.println("client starts");
-		Socket socket = new Socket("localhost", 5123);
-		if (socket.isConnected()) {
-			System.out.println("success");
+	public Client() throws IOException {
+		if (VERBOSE) {
+			System.out.println("Client starts");
 		}
 
-		UTFOutputStream outputStream = new UTFOutputStream(socket.getOutputStream());
+		this.socket = new Socket("localhost", 5123);
 
+		if (VERBOSE) {
+			if (socket.isConnected()) {
+				System.out.println("Success");
+			} else {
+				System.out.println("Fail");
+				return;
+			}
+		}
+
+		outStream = new UTFOutputStream(socket.getOutputStream());
+		inStream = new UTFInputStream(socket.getInputStream());
+		
+		ai = new SimpleAI();
+	}
+
+	public void login() throws JAXBException, IOException {
 		String msg = XMLHandler.getInstance().createLoginMessage();
 
-		outputStream.writeUTF8(msg);
-		outputStream.flush();
+		outStream.writeUTF8(msg);
+		outStream.flush();
 
-		UTFInputStream inStream = new UTFInputStream(socket.getInputStream());
-		
+	}
+
+	public void communicate() throws IOException, JAXBException {
 
 		while (true) {
 			String answer = inStream.readUTF8();
@@ -57,9 +81,12 @@ public class Client {
 				break;
 			case AWAITMOVE:
 				AwaitMoveMessageType awaitMoveMsg = mazeCom.getAwaitMoveMessage();
+				MoveMessageType moveMsg = ai.getNextMove(awaitMoveMsg);
 				if (VERBOSE) {
 					System.out.println("Await Move Message received.");
 				}
+			default:
+				break;
 			}
 		}
 
