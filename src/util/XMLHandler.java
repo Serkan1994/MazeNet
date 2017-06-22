@@ -1,3 +1,4 @@
+package util;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -40,7 +41,7 @@ public class XMLHandler {
 	 	unmarshaller = jc.createUnmarshaller();
 	}
 	
-    String createLoginMessage() throws JAXBException {
+    public String createLoginMessage() throws JAXBException {
         MazeCom msg = of.createMazeCom();
         msg.setMcType(MazeComType.LOGIN);
         LoginMessageType type = of.createLoginMessageType();
@@ -51,11 +52,11 @@ public class XMLHandler {
         return sw.toString();
     }
     
-    MoveMessageType createMoveMessage() {
+    public MoveMessageType createMoveMessage() {
     	return of.createMoveMessageType();
     }
 
-    MazeCom getMessage(String xmlString) throws JAXBException {
+    public MazeCom getMessage(String xmlString) throws JAXBException {
     	StringReader reader = new StringReader(xmlString);
     	return (MazeCom) unmarshaller.unmarshal(reader);
     }

@@ -16,6 +16,9 @@ import generated.AwaitMoveMessageType;
 import generated.LoginReplyMessageType;
 import generated.MazeCom;
 import generated.MoveMessageType;
+import util.UTFInputStream;
+import util.UTFOutputStream;
+import util.XMLHandler;
 
 //import mypackage.EchoMessage;
 

@@ -6,6 +6,7 @@ import generated.BoardType;
 import generated.MoveMessageType;
 import generated.TreasureType;
 import generated.TreasuresToGoType;
+import util.XMLHandler;
 
 public class SimpleAI implements AI {
 	
@@ -16,6 +17,12 @@ public class SimpleAI implements AI {
 		List<TreasuresToGoType> ttgt = ammt.getTreasuresToGo();
 		List<TreasureType> ftt = ammt.getFoundTreasures();
 		TreasureType tt = ammt.getTreasure();
-		return null;
+		
+		
+		XMLHandler.getInstance().
+		
+		
+		
+		
 	}
 }
