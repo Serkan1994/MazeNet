@@ -9,6 +9,7 @@ import javax.xml.bind.Unmarshaller;
 import generated.LoginMessageType;
 import generated.MazeCom;
 import generated.MazeComType;
+import generated.MoveMessageType;
 import generated.ObjectFactory;
 
 public class XMLHandler {
@@ -49,11 +50,16 @@ public class XMLHandler {
         marshaller.marshal(msg,sw);
         return sw.toString();
     }
+    
+    MoveMessageType createMoveMessage() {
+    	return of.createMoveMessageType();
+    }
 
     MazeCom getMessage(String xmlString) throws JAXBException {
     	StringReader reader = new StringReader(xmlString);
     	return (MazeCom) unmarshaller.unmarshal(reader);
     }
 	
+    
  	
 }

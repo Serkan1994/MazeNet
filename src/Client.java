@@ -12,7 +12,6 @@ import javax.xml.bind.JAXBException;
 
 import AI.AI;
 import AI.SimpleAI;
-import AI.simpleAI;
 import generated.AwaitMoveMessageType;
 import generated.LoginReplyMessageType;
 import generated.MazeCom;
@@ -32,7 +31,9 @@ public class Client {
 	private static boolean VERBOSE = true;
 
 	public static void main(String[] args) throws UnknownHostException, IOException, JAXBException {
-		new Client();
+		Client client = new Client();
+		client.login();
+		client.communicate();
 	}
 
 	public Client() throws IOException {
