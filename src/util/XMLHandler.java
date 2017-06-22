@@ -12,6 +12,7 @@ import generated.MazeCom;
 import generated.MazeComType;
 import generated.MoveMessageType;
 import generated.ObjectFactory;
+import generated.PositionType;
 
 public class XMLHandler {
 	private static XMLHandler instance;
@@ -54,6 +55,10 @@ public class XMLHandler {
     
     public MoveMessageType createMoveMessage() {
     	return of.createMoveMessageType();
+    }
+    
+    public PositionType createPosition() {
+    	return of.createPositionType();
     }
 
     public MazeCom getMessage(String xmlString) throws JAXBException {
