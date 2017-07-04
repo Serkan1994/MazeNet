@@ -15,6 +15,7 @@ import AI.SimpleAI;
 import generated.AwaitMoveMessageType;
 import generated.LoginReplyMessageType;
 import generated.MazeCom;
+import generated.MazeComType;
 import generated.MoveMessageType;
 import util.UTFInputStream;
 import util.UTFOutputStream;
@@ -58,7 +59,6 @@ public class Client {
 		outStream = new UTFOutputStream(socket.getOutputStream());
 		inStream = new UTFInputStream(socket.getInputStream());
 		
-		ai = new SimpleAI();
 	}
 
 	public void login() throws JAXBException, IOException {
@@ -84,8 +84,15 @@ public class Client {
 				}
 				break;
 			case AWAITMOVE:
+				if(ai == null) {
+					ai = new SimpleAI(this.id);
+				}
 				AwaitMoveMessageType awaitMoveMsg = mazeCom.getAwaitMoveMessage();
 				MoveMessageType moveMsg = ai.getNextMove(awaitMoveMsg);
+				MazeCom mc = XMLHandler.getInstance().createMazeCom();
+				mc.setMoveMessage(moveMsg);
+				mc.setMcType(MazeComType.MOVE);
+				outStream.writeUTF8(XMLHandler.getInstance().getXMLString(mc));
 				if (VERBOSE) {
 					System.out.println("Await Move Message received.");
 				}

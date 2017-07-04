@@ -57,8 +57,19 @@ public class XMLHandler {
     	return of.createMoveMessageType();
     }
     
+    public MazeCom createMazeCom() {
+    	return of.createMazeCom();
+    }
+    
     public PositionType createPosition() {
     	return of.createPositionType();
+    }
+    
+    public String getXMLString(MazeCom mc) throws JAXBException {
+    	StringWriter sw = new StringWriter();
+        marshaller.marshal(mc,sw);
+        return sw.toString();
+    	
     }
 
     public MazeCom getMessage(String xmlString) throws JAXBException {
