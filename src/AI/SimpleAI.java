@@ -6,10 +6,11 @@ import Server.Board;
 import Server.Position;
 import generated.AwaitMoveMessageType;
 import generated.BoardType;
+import generated.CardType;
+import generated.CardType.Openings;
 import generated.MoveMessageType;
 import generated.PositionType;
 import generated.TreasureType;
-import jdk.internal.dynalink.support.BottomGuardingDynamicLinker;
 import util.XMLHandler;
 
 public class SimpleAI implements AI {
@@ -27,17 +28,16 @@ public class SimpleAI implements AI {
 		BoardType bt = ammt.getBoard();
 
 		Board board = new Board(bt);
-		
-		//int[] tp = getTreasurePosition(bt, ammt.getTreasure());
-		//Position treasurePosition = new Position(tp[0], tp[1]);
+
+		// int[] tp = getTreasurePosition(bt, ammt.getTreasure());
+		// Position treasurePosition = new Position(tp[0], tp[1]);
 
 		double minDistance = Integer.MAX_VALUE;
 		PositionType bestPos = new Position();
-		PositionType bestShiftPos = new Position(1,0);
-
+		PositionType bestShiftPos = new Position(1, 0);
+		CardType bestCardType = null;
+		
 		MoveMessageType moveMessage = XMLHandler.getInstance().createMoveMessage();
-
-		moveMessage.setShiftCard(bt.getShiftCard());
 
 		PositionType pt = new PositionType();
 
@@ -46,44 +46,52 @@ public class SimpleAI implements AI {
 
 			pt.setRow(shiftPos[0]);
 			pt.setCol(shiftPos[1]);
-			
-			if(board.getForbidden() != null && pt.getRow() == board.getForbidden().getRow() && pt.getCol() == board.getForbidden().getCol()) {
+
+			if (board.getForbidden() != null && pt.getRow() == board.getForbidden().getRow()
+					&& pt.getCol() == board.getForbidden().getCol()) {
 				System.out.println("forbidden position");
 				continue;
 			}
-			
-			moveMessage.setShiftPosition(pt);
-			Board dummyBoard = board.fakeShift(moveMessage);
-		
-			int[] pp = getPlayerPosition(dummyBoard);
-			int[] tp = getTreasurePosition(dummyBoard, ammt.getTreasure());
-			Position treasurePos = new Position(tp[0], tp[1]);
-			List<Position> positions = dummyBoard.getAllReachablePositions(new Position(pp[0], pp[1]));
-			positions.add(new Position(pp[0], pp[1]));
-			for (Position pos : positions) {
-				if (getEuclidDistance(pos, treasurePos) < minDistance) {
-					System.out.println("new best position found: ");
-					System.out.println();
-					minDistance = getEuclidDistance(pos, treasurePos);
-					bestPos.setRow(pos.getRow());
-					bestPos.setCol(pos.getCol());
 
-					bestShiftPos.setRow(pt.getRow());
-					bestShiftPos.setCol(pt.getCol());
-					
-					
-					System.out.println("Best shift pos: " + bestShiftPos.getRow() + "," + bestShiftPos.getCol());
-					System.out.println("Best position: " + bestPos.getRow() + "," + bestPos.getCol());
-					if (minDistance == 0) {
-						break;
+			moveMessage.setShiftPosition(pt);
+			CardType[] cards = getAllRotations(bt.getShiftCard());
+
+			for (CardType card : cards) {
+				moveMessage.setShiftCard(card);
+
+				Board dummyBoard = board.fakeShift(moveMessage);
+
+				int[] pp = getPlayerPosition(dummyBoard);
+				int[] tp = getTreasurePosition(dummyBoard, ammt.getTreasure());
+				Position treasurePos = new Position(tp[0], tp[1]);
+				List<Position> positions = dummyBoard.getAllReachablePositions(new Position(pp[0], pp[1]));
+				positions.add(new Position(pp[0], pp[1]));
+				for (Position pos : positions) {
+					if (getManhattanDistance(pos, treasurePos) < minDistance) {
+						System.out.println("new best position found: ");
+						System.out.println();
+						minDistance = getEuclidDistance(pos, treasurePos);
+						bestPos.setRow(pos.getRow());
+						bestPos.setCol(pos.getCol());
+						bestCardType = card;
+
+						bestShiftPos.setRow(pt.getRow());
+						bestShiftPos.setCol(pt.getCol());
+
+						System.out.println("Best shift pos: " + bestShiftPos.getRow() + "," + bestShiftPos.getCol());
+						System.out.println("Best position: " + bestPos.getRow() + "," + bestPos.getCol());
+						if (minDistance == 0) {
+							break;
+						}
 					}
 				}
 			}
 		}
-		
+
+		moveMessage.setShiftCard(bestCardType);
 		moveMessage.setShiftPosition(bestShiftPos);
 		moveMessage.setNewPinPos(bestPos);
-		
+
 		System.out.println("Best shift pos: " + bestShiftPos.getRow() + "," + bestShiftPos.getCol());
 		System.out.println("Best position: " + bestPos.getRow() + "," + bestPos.getCol());
 
@@ -115,9 +123,29 @@ public class SimpleAI implements AI {
 	public int getManhattanDistance(Position p1, Position p2) {
 		return Math.abs(p1.getRow() - p2.getRow()) + Math.abs(p1.getCol() - p2.getCol());
 	}
-	
+
 	public double getEuclidDistance(Position p1, Position p2) {
-		return Math.sqrt(Math.pow(p1.getRow()-p2.getRow(), 2) + Math.pow(p1.getCol()-p2.getCol(), 2));
+		return Math.sqrt(Math.pow(p1.getRow() - p2.getRow(), 2) + Math.pow(p1.getCol() - p2.getCol(), 2));
+	}
+
+	public CardType[] getAllRotations(CardType card) {
+		CardType[] allRotations = new CardType[4];
+		allRotations[0] = card;
+		allRotations[1] = rotate(card);
+		allRotations[2] = rotate(rotate(card));
+		allRotations[3] = rotate(rotate(rotate(card)));
+		return allRotations;
+	}
+
+	public CardType rotate(CardType card) {
+		Openings openings = card.getOpenings();
+		boolean top = openings.isTop();
+		openings.setTop(openings.isLeft());
+		openings.setLeft(openings.isBottom());
+		openings.setBottom(openings.isRight());
+		openings.setRight(top);
+		card.setOpenings(openings);
+		return card;
 	}
 
 	public int[] getPlayerPosition(BoardType bt) {

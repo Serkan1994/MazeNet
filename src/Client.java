@@ -36,17 +36,28 @@ public class Client {
 	private static boolean VERBOSE = true;
 
 	public static void main(String[] args) throws UnknownHostException, IOException, JAXBException {
-		Client client = new Client();
+		Client client;
+		if(args.length == 1) {
+			client = new Client(args[0]);
+		}
+		else {
+			client = new Client();
+		}
 		client.login();
 		client.communicate();
 	}
 
 	public Client() throws IOException {
+		this("192.168.5.123");
+		//this("localhost");
+	}
+	
+	public Client(String ip) throws IOException {
 		if (VERBOSE) {
 			System.out.println("Client starts");
 		}
 
-		this.socket = new Socket("localhost", 5123);
+		this.socket = new Socket(ip, 5123);
 
 		if (VERBOSE) {
 			if (socket.isConnected()) {
@@ -59,7 +70,6 @@ public class Client {
 
 		outStream = new UTFOutputStream(socket.getOutputStream());
 		inStream = new UTFInputStream(socket.getInputStream());
-
 	}
 
 	public void login() throws JAXBException, IOException {
