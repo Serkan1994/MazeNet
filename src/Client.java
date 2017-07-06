@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 import javax.xml.bind.JAXBException;
 
 import AI.AI;
+import AI.RandomAI;
 import AI.SimpleAI;
 import generated.AwaitMoveMessageType;
 import generated.LoginReplyMessageType;
@@ -58,7 +59,7 @@ public class Client {
 
 		outStream = new UTFOutputStream(socket.getOutputStream());
 		inStream = new UTFInputStream(socket.getInputStream());
-		
+
 	}
 
 	public void login() throws JAXBException, IOException {
@@ -76,6 +77,7 @@ public class Client {
 			MazeCom mazeCom = XMLHandler.getInstance().getMessage(answer);
 			switch (mazeCom.getMcType()) {
 			case LOGINREPLY:
+				System.out.println("this gets called. ");
 				LoginReplyMessageType loginReplyMsg = mazeCom.getLoginReplyMessage();
 				this.id = loginReplyMsg.getNewID();
 				if (VERBOSE) {
@@ -84,8 +86,10 @@ public class Client {
 				}
 				break;
 			case AWAITMOVE:
-				if(ai == null) {
+				if (ai == null) {
+					// ai = new RandomAI();
 					ai = new SimpleAI(this.id);
+					// ai = new RandomAI(this.id);
 				}
 				AwaitMoveMessageType awaitMoveMsg = mazeCom.getAwaitMoveMessage();
 				MoveMessageType moveMsg = ai.getNextMove(awaitMoveMsg);

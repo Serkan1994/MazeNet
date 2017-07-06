@@ -1,6 +1,7 @@
 package AI;
 
 import generated.AwaitMoveMessageType;
+import generated.BoardType;
 import generated.MoveMessageType;
 import generated.PositionType;
 import util.XMLHandler;
@@ -9,6 +10,7 @@ public class RandomAI implements AI {
 
 	@Override
 	public MoveMessageType getNextMove(AwaitMoveMessageType ammt) {
+		BoardType bt = ammt.getBoard();
 		MoveMessageType mmt = XMLHandler.getInstance().createMoveMessage();
 		PositionType ptShift = XMLHandler.getInstance().createPosition();
 	 	PositionType ptPin = XMLHandler.getInstance().createPosition();
